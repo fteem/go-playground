@@ -15,17 +15,20 @@ func main() {
 
 	var wg sync.WaitGroup
 
-	go func(wg *sync.WaitGroup) {
-		for group := range groups {
-			wg.Add(1)
-			go func(wg *sync.WaitGroup) {
+	for i := 0; i < 10; i++ {
+		wg.Add(1)
+		go func(wg *sync.WaitGroup) {
+			for group := range groups {
 				group.work(rows)
-				wg.Done()
-			}(wg)
-		}
+			}
+			wg.Done()
+		}(&wg)
+	}
+
+	go func() {
 		wg.Wait()
 		close(rows)
-	}(&wg)
+	}()
 
 	readCSV("cities.csv", groups)
 
