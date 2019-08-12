@@ -7,7 +7,9 @@ import (
 	"os"
 )
 
-func readCSV(path string, out chan workerGroup) {
+type row []string
+
+func readCSV(path string, out chan row) {
 	csvFile, err := os.Open(path)
 	if err != nil {
 		log.Fatalf("Cannot open CSV: %v", err)
@@ -25,11 +27,7 @@ func readCSV(path string, out chan workerGroup) {
 			} else if err != nil {
 				log.Fatalf("Error reading file: %v", err)
 			}
-			out <- newWorkerGroup(
-				line[2],
-				newAqiClient(line[2]),
-				newDarkskyClient(line[0], line[1]),
-			)
+			out <- line
 		}
 	}(reader)
 }
