@@ -20,14 +20,14 @@ func newWorkerGroup(city string, aqiWorker worker, darkskyWorker worker) workerG
 
 func (wg workerGroup) work(out chan<- row) {
 	indexChan := make(chan string)
-	tempChan := make(chan string)
+	darkskyChan := make(chan string)
 
 	go wg.aqiWorker.work(indexChan)
-	go wg.darkskyWorker.work(tempChan)
+	go wg.darkskyWorker.work(darkskyChan)
 
 	out <- row{
 		wg.city,
-		<-tempChan,
+		<-darkskyChan,
 		<-indexChan,
 	}
 }
