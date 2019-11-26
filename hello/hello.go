@@ -1,8 +1,17 @@
 package hello
 
-func Hello(name string) string {
+const spanish = "Spanish"
+const englishHelloPrefix = "Hello, "
+const spanishHelloPrefix = "Hola, "
+
+func Hello(name, language string) string {
 	if name == "" {
 		name = "World"
 	}
-	return "Hello, " + name
+
+	if language == spanish {
+		return spanishHelloPrefix + name
+	}
+
+	return englishHelloPrefix + name
 }
