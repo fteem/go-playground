@@ -1,18 +1,47 @@
 package notifications
 
-import "testing"
+import (
+	"errors"
+	"testing"
+
+	"github.com/fteem/order-notifications/user"
+)
 
 func TestInformOrderShipped(t *testing.T) {
-	user := User{
-		Name:  "Peggy",
-		Phone: "+12 345 678 999",
+	cases := []struct {
+		user         user.User
+		orderID      string
+		sendingError error
+		name         string
+		want         bool
+	}{
+		{
+			user:         user.User{"Peggy", "+12 345 678 999"},
+			orderID:      "12345",
+			sendingError: nil,
+			want:         true,
+			name:         "Successful send",
+		},
+		{
+			user:         user.User{"Peggy", "+12 345 678 999"},
+			orderID:      "12345",
+			sendingError: errors.New("Sending failed"),
+			want:         false,
+			name:         "Unsuccessful send",
+		},
 	}
-	orderID := "12345"
 
-	got := InformOrderShipped(user, orderID)
-	want := true
+	for _, tc := range cases {
+		t.Run(tc.name, func(t *testing.T) {
+			mockSend := func(user.User, string) error {
+				return tc.sendingError
+			}
 
-	if want != got {
-		t.Errorf("Want '%t', got '%t'", want, got)
+			got := InformOrderShipped(tc.user, tc.orderID, mockSend)
+
+			if tc.want != got {
+				t.Errorf("Want '%t', got '%t'", tc.want, got)
+			}
+		})
 	}
 }
