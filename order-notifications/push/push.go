@@ -1,4 +1,4 @@
-package sms
+package push
 
 import (
 	"time"
@@ -6,9 +6,9 @@ import (
 	"github.com/fteem/order-notifications/user"
 )
 
-type Dispatcher struct{}
+type Notifier struct{}
 
-func (d Dispatcher) Send(receiver user.User, message string) error {
+func (n Notifier) Send(receiver user.User, message string) error {
 	// Simulating API call...
 	time.Sleep(3 * time.Second)
 

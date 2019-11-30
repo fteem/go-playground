@@ -1,4 +1,4 @@
-package notifications
+package orders
 
 import (
 	"fmt"
@@ -6,9 +6,13 @@ import (
 	"github.com/fteem/order-notifications/user"
 )
 
-func InformOrderShipped(receiver user.User, orderID string, sendSMS func(user.User, string) error) bool {
+type Sender interface {
+	Send(user.User, string) error
+}
+
+func InformOrderShipped(receiver user.User, orderID string, sender Sender) bool {
 	message := fmt.Sprintf("Your order #%s is shipped!", orderID)
-	err := sendSMS(receiver, message)
+	err := sender.Send(receiver, message)
 
 	if err != nil {
 		return false

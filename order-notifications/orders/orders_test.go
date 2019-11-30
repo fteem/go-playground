@@ -1,4 +1,4 @@
-package notifications
+package orders
 
 import (
 	"errors"
@@ -6,6 +6,14 @@ import (
 
 	"github.com/fteem/order-notifications/user"
 )
+
+type mockSender struct {
+	sendingError error
+}
+
+func (ms mockSender) Send(u user.User, m string) error {
+	return ms.sendingError
+}
 
 func TestInformOrderShipped(t *testing.T) {
 	cases := []struct {
@@ -33,11 +41,8 @@ func TestInformOrderShipped(t *testing.T) {
 
 	for _, tc := range cases {
 		t.Run(tc.name, func(t *testing.T) {
-			mockSend := func(user.User, string) error {
-				return tc.sendingError
-			}
-
-			got := InformOrderShipped(tc.user, tc.orderID, mockSend)
+			ms := mockSender{tc.sendingError}
+			got := InformOrderShipped(tc.user, tc.orderID, ms)
 
 			if tc.want != got {
 				t.Errorf("Want '%t', got '%t'", tc.want, got)
