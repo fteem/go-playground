@@ -1,0 +1,16 @@
+version: '3.7'
+
+services:
+  server:
+    build:
+      context: .
+      target: builder
+    image: ilija/db-auth-server
+    security_opt:
+      - seccomp:unconfined
+    environment:
+      APP_SERVER_HTTP_PORT: ${APP_SERVER_HTTP_PORT}
+    ports:
+      - ${APP_SERVER_HTTP_PORT}:${APP_SERVER_HTTP_PORT}
+    volumes:
+      - .:/app
