@@ -11,15 +11,15 @@ import (
 	"github.com/jinzhu/gorm"
 )
 
-func createUser(t *testing.T, db *gorm.DB) func() {
+func createUser(t *testing.T, db *gorm.DB) {
 	user := User{Username: "jane", Password: "doe123"}
 	if err := db.Create(&user).Error; err != nil {
 		t.Fatal(err)
 	}
 
-	return func() {
+	t.Cleanup(func() {
 		db.Delete(&user)
-	}
+	})
 }
 
 func TestServer(t *testing.T) {
@@ -29,8 +29,7 @@ func TestServer(t *testing.T) {
 	}
 	defer db.Close()
 
-	cleanup := createUser(t, db)
-	defer cleanup()
+	createUser(t, db)
 
 	r := Router(db)
 
