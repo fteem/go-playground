@@ -5,34 +5,15 @@ import (
 	"flag"
 	"fmt"
 	"log"
-	"math/rand"
 	"net/http"
-	"time"
 
 	"github.com/gorilla/mux"
 	"github.com/jinzhu/gorm"
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-type Snippet struct {
-	gorm.Model
-
-	Body     string `gorm:"type:text"`
-	URI      string `gorm:"type:varchar(255);unique"`
-	Title    string
-	Language string
-}
-
-func (s *Snippet) BeforeCreate() (err error) {
-	letters := []string{"s", "n", "i", "p", "p", "e", "t"}
-	timestamp := time.Now().UnixNano()
-	s.URI = fmt.Sprintf("%s-%d", letters[int(timestamp)%len(letters)], timestamp)
-	return
-}
-
 var (
-	seededRand = rand.New(rand.NewSource(time.Now().UnixNano()))
-	addr       = flag.String("addr", "127.0.0.1:8080", "http service address")
+	addr = flag.String("addr", "127.0.0.1:8080", "http service address")
 )
 
 func openDB() *gorm.DB {
