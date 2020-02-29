@@ -16,7 +16,7 @@ var (
 	addr = flag.String("addr", "127.0.0.1:8080", "http service address")
 )
 
-func openDB() *gorm.DB {
+func openDbConn() *gorm.DB {
 	conn, err := gorm.Open("sqlite3", "./snippetbin.db")
 	if err != nil {
 		log.Fatal(err)
@@ -172,7 +172,7 @@ func deleteSnippet(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
 func main() {
 	flag.Parse()
 
-	dbConn := openDB()
+	dbConn := openDbConn()
 	defer dbConn.Close()
 
 	dbConn.AutoMigrate(&Snippet{})
