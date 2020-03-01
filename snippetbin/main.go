@@ -16,14 +16,14 @@ func getSnippets(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) { // 
 	return func(w http.ResponseWriter, r *http.Request) {
 		var snippets []Snippet
 		if err := db.Find(&snippets).Error; err != nil {
-			fmt.Errorf("error retrieving snippets:", err)
+			fmt.Errorf("error retrieving snippets", err)
 			http.Error(w, err.Error(), http.StatusNotFound)
 			return
 		}
 
 		response, err := json.Marshal(snippets)
 		if err != nil {
-			fmt.Errorf("marshal error:", err)
+			fmt.Errorf("marshal error", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -40,14 +40,14 @@ func getSnippet(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
 
 		var snippet Snippet
 		if err := db.First(&snippet, snippetID).Error; err != nil {
-			fmt.Errorf("error retrieving snippet:", err)
+			fmt.Errorf("error retrieving snippet", err)
 			http.Error(w, fmt.Sprintf("snippet with ID: %s not found", snippetID), http.StatusNotFound)
 			return
 		}
 
 		response, err := json.Marshal(snippet)
 		if err != nil {
-			fmt.Errorf("marshal error:", err)
+			fmt.Errorf("marshal error", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -76,7 +76,7 @@ func createSnippet(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
 
 		response, err := json.Marshal(snippet)
 		if err != nil {
-			fmt.Errorf("marshal error:", err)
+			fmt.Errorf("marshal error", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -96,7 +96,7 @@ func updateSnippet(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
 		snippetID := vars["id"]
 
 		if err := db.First(&snippet, snippetID).Error; err != nil {
-			fmt.Errorf("error retrieving snippet:", err)
+			fmt.Errorf("error retrieving snippet", err)
 			http.Error(w, fmt.Sprintf("Snippet with ID: %s not found", snippetID), http.StatusNotFound)
 			return
 		}
@@ -116,7 +116,7 @@ func updateSnippet(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
 
 		response, err := json.Marshal(snippet)
 		if err != nil {
-			fmt.Errorf("marshal error:", err)
+			fmt.Errorf("marshal error", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
@@ -134,7 +134,7 @@ func deleteSnippet(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
 
 		var snippet Snippet
 		if err := db.First(&snippet, snippetID).Error; err != nil {
-			fmt.Errorf("error retrieving snippet:", err)
+			fmt.Errorf("error retrieving snippet", err)
 			http.Error(w, fmt.Sprintf("Snippet with ID: %s not found", snippetID), http.StatusNotFound)
 			return
 		}
@@ -147,7 +147,7 @@ func deleteSnippet(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
 
 		response, err := json.Marshal(snippet)
 		if err != nil {
-			fmt.Errorf("marshal error:", err)
+			fmt.Errorf("marshal error", err)
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
