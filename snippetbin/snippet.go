@@ -3,6 +3,8 @@ package main
 import (
 	"fmt"
 	"time"
+
+	"github.com/jinzhu/gorm"
 )
 
 type Snippet struct {
