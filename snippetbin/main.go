@@ -2,7 +2,6 @@ package main
 
 import (
 	"encoding/json"
-	"flag"
 	"fmt"
 	"log"
 	"net/http"
@@ -13,19 +12,7 @@ import (
 	_ "github.com/jinzhu/gorm/dialects/sqlite"
 )
 
-var (
-	addr = flag.String("addr", "127.0.0.1:8080", "http service address")
-)
-
-func openDbConn() *gorm.DB {
-	conn, err := gorm.Open("sqlite3", "./snippetbin.db")
-	if err != nil {
-		log.Fatal(err)
-	}
-	return conn
-}
-
-func getSnippets(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
+func getSnippets(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) { // http.Handler interface
 	return func(w http.ResponseWriter, r *http.Request) {
 		var snippets []Snippet
 		if err := db.Find(&snippets).Error; err != nil {
@@ -171,19 +158,18 @@ func deleteSnippet(db *gorm.DB) func(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	flag.Parse()
-
-	dbConn := openDbConn()
+	dbConn, err := gorm.Open("sqlite3", "./snippetbin.db")
+	if err != nil {
+		log.Fatal(err)
+	}
 	defer dbConn.Close()
 
-	dbConn.AutoMigrate(&Snippet{})
-
 	router := mux.NewRouter().StrictSlash(true)
-	router.HandleFunc("/snippets", getSnippets(dbConn)).Methods("GET")
+	router.HandleFunc("/snippets", getSnippets(dbConn)).Methods("GET") // GET /snippets
 	router.HandleFunc("/snippets", createSnippet(dbConn)).Methods("POST")
 	router.HandleFunc("/snippets/{id}", getSnippet(dbConn)).Methods("GET")
 	router.HandleFunc("/snippets/{id}", updateSnippet(dbConn)).Methods("PATCH")
 	router.HandleFunc("/snippets/{id}", deleteSnippet(dbConn)).Methods("DELETE")
 
-	log.Fatal(http.ListenAndServe(*addr, router))
+	log.Fatal(http.ListenAndServe("127.0.0.1:8080", router))
 }
