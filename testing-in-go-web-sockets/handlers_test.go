@@ -102,16 +102,16 @@ func TestBidsHandler(t *testing.T) {
 		},
 		{
 
-			name: "with bad bid",
+			name: "good bid on expired auction",
 			bids: []*Bid{
 				&Bid{
 					UserID: 1,
 					Amount: 20,
 				},
 			},
-			duration: time.Hour * 1,
-			message:  inbound{UserID: 1, Amount: 10},
-			reply:    outbound{Body: "amount must be larger than 20.00"},
+			duration: time.Hour * -1,
+			message:  inbound{UserID: 1, Amount: 30},
+			reply:    outbound{Body: "auction already closed"},
 		},
 	}
 
