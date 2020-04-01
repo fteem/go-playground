@@ -15,5 +15,5 @@ type command struct {
 	id        ID
 	recipient string
 	sender    string
-	text      []byte
+	body      []byte
 }

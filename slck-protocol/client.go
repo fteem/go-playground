@@ -4,6 +4,7 @@ import (
 	"bufio"
 	"bytes"
 	"fmt"
+	"io"
 	"net"
 	"strconv"
 )
@@ -13,23 +14,31 @@ var (
 )
 
 type client struct {
-	conn     net.Conn
-	outbound chan<- command
-	register chan<- *client
-	username string
+	conn       net.Conn
+	outbound   chan<- command
+	register   chan<- *client
+	deregister chan<- *client
+	username   string
 }
 
-func newClient(conn net.Conn, o chan<- command, r chan<- *client) *client {
+func newClient(conn net.Conn, o chan<- command, r chan<- *client, d chan<- *client) *client {
 	return &client{
-		conn:     conn,
-		outbound: o,
-		register: r,
+		conn:       conn,
+		outbound:   o,
+		register:   r,
+		deregister: d,
 	}
 }
 
 func (c *client) read() error {
 	for {
 		msg, err := bufio.NewReader(c.conn).ReadBytes('\n')
+		if err == io.EOF {
+			// Connection closed, deregister client
+			c.deregister <- c
+			return nil
+		}
+
 		if err != nil {
 			return err
 		}
@@ -140,7 +149,7 @@ func (c *client) msg(args []byte) error {
 	c.outbound <- command{
 		recipient: string(recipient),
 		sender:    c.username,
-		text:      body,
+		body:      body,
 		id:        MSG,
 	}
 

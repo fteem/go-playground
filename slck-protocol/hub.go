@@ -5,26 +5,30 @@ import (
 )
 
 type hub struct {
-	newClients chan *client
-	clients    map[string]*client
-	channels   map[string]*channel
-	commands   chan command
+	channels        map[string]*channel
+	clients         map[string]*client
+	commands        chan command
+	deregistrations chan *client
+	registrations   chan *client
 }
 
 func newHub() *hub {
 	return &hub{
-		newClients: make(chan *client),
-		clients:    make(map[string]*client),
-		channels:   make(map[string]*channel),
-		commands:   make(chan command),
+		registrations:   make(chan *client),
+		deregistrations: make(chan *client),
+		clients:         make(map[string]*client),
+		channels:        make(map[string]*channel),
+		commands:        make(chan command),
 	}
 }
 
 func (h *hub) run() {
 	for {
 		select {
-		case client := <-h.newClients:
+		case client := <-h.registrations:
 			h.register(client)
+		case client := <-h.deregistrations:
+			h.unregister(client)
 		case cmd := <-h.commands:
 			switch cmd.id {
 			case JOIN:
@@ -32,7 +36,7 @@ func (h *hub) run() {
 			case LEAVE:
 				h.leaveChannel(cmd.sender, cmd.recipient)
 			case MSG:
-				h.message(cmd.sender, cmd.recipient, cmd.text)
+				h.message(cmd.sender, cmd.recipient, cmd.body)
 			case USRS:
 				h.listUsers(cmd.sender)
 			case CHNS:
@@ -51,6 +55,16 @@ func (h *hub) register(c *client) {
 	} else {
 		h.clients[c.username] = c
 		c.conn.Write([]byte("OK\n"))
+	}
+}
+
+func (h *hub) deregister(c *client) {
+	if _, exists := h.clients[c.username]; exists {
+		delete(h.clients, c.username)
+
+		for _, channel := range h.channels {
+			delete(channel.clients, c)
+		}
 	}
 }
 

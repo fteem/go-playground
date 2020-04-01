@@ -20,7 +20,12 @@ func main() {
 			log.Printf("%v", err)
 		}
 
-		c := newClient(conn, hub.commands, hub.newClients)
+		c := newClient(
+			conn,
+			hub.commands,
+			hub.registrations,
+			hub.deregistrations,
+		)
 		go c.read()
 	}
 }
