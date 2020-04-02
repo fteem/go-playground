@@ -1,6 +1,6 @@
 ## `SLCK`
 
-`SLCK` is a toy protocl written for the purpose of an article for [my
+`SLCK` is a toy protocol written for the purpose of an article for [my
 blog](https://ieftimov.com). You can read about it
 [here](https://ieftimov.com/post/understanding-bytes-golang-build-tcp-protocol/).
 
