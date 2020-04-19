@@ -28,7 +28,7 @@ func (h *hub) run() {
 		case client := <-h.registrations:
 			h.register(client)
 		case client := <-h.deregistrations:
-			h.unregister(client)
+			h.deregister(client)
 		case cmd := <-h.commands:
 			switch cmd.id {
 			case JOIN:
