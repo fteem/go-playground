@@ -104,7 +104,7 @@ func (h *hub) message(u string, r string, m []byte) {
 			}
 		case '@':
 			if user, ok := h.clients[r]; ok {
-				msg := append([]byte(user.username+": "), m...)
+				msg := append([]byte(sender.username+": "), m...)
 				msg = append(msg, '\n')
 
 				user.conn.Write(msg)
